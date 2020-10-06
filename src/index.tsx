@@ -3,33 +3,30 @@ import { getSSITag, fetchFallbackHtml, remountScripts } from './utils'
 import { SSIInlcudeProps } from './types'
 
 export const SSIInclude = (props: SSIInlcudeProps) => {
-  const [loading, setLoading] = useState(false)
-  const [content, setContent] = useState(getSSITag(props.url, props.client))
+  const [content, setContent] = useState(getSSITag(props.url))
+
   useEffect(() => {
-    if (props.client || content === getSSITag(props.url, props.client)) {
-      setLoading(true)
+    if (props.client || content === getSSITag(props.url)) {
       fetchFallbackHtml(props.url)
         .then(response => {
           setContent(response)
-        })
-        .catch(err => {
-          setContent(err.message)
-        })
-        .finally(() => {
           if (props.onReady) {
             props.onReady()
           }
-          setLoading(false)
+        })
+        .catch(err => {
+          if (props.onReady) {
+            props.onReady(err)
+          }
         })
     }
+  }, [])
+
+  useEffect(() => {
     if (props.client && content) {
       remountScripts(props.tagId)
     }
   }, [content])
-
-  if (loading) {
-    return <p>Loading...</p>
-  }
 
   return (
     <div

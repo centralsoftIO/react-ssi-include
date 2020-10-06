@@ -1,29 +1,32 @@
-const getSSITag = (url: string, client?: boolean) => {
-  if (client) {
-    return ''
-  }
-  return `<!--#include virtual="${url}" -->`
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+const getSSITag = (url: string) => `<!--#include virtual="${url}" -->`
 
 const fetchFallbackHtml = (url: string): Promise<string> => {
+  console.error(`Server Side Include with url ${url} failed, falling back to client side include.`)
   let basicAuthHeader: any
   try {
     const { origin, username, password, pathname } = new URL(url)
     if (username && password) {
       url = `${origin}${pathname}`
-      basicAuthHeader = { key: 'Authorization', value: 'Basic ' + btoa(username + ':' + password) }
+      basicAuthHeader = {
+        Authorization: 'Basic ' + btoa(username + ':' + password)
+      }
     }
+    // eslint-disable-next-line no-empty
   } catch {}
-
   return new Promise((resolve, reject) => {
-    fetch(url, basicAuthHeader)
+    fetch(url, {
+      headers: basicAuthHeader
+    })
       .then(res => {
         if (!res.ok) {
-          reject(`Failed to load ${url}. Got status ${res.status}.`)
+          reject(new Error(`Failed to load ${url}. Got status ${res.status}.`))
         }
         return res.text()
       })
       .then(data => resolve(data))
+      .catch(err => reject(err))
   })
 }
 
