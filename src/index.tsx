@@ -8,7 +8,7 @@ export const SSIInclude = (props: SSIInlcudeProps) => {
   const [content, setContent] = useState(initialContent)
 
   useEffect(() => {
-    if (props.client || content === getSSITag(props.url)) {
+    if (content === getSSITag(props.url)) {
       fetchFallbackHtml(props.url)
         .then(response => {
           setContent(response)
