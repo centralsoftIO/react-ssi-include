@@ -20,14 +20,11 @@ Tested with next.js (SSR) and a fronting nginx (k8s).
 ```
 import { SSIInclude } from 'react-ssi-include';
 
-const isOnClient = typeof window !== "undefined"
-
 const Component = () => (
   <SSIInclude
     tagId="partial-container"
     url="https://example.com/some-partial"
-    client={isOnClient} // falls back to load the include client side in case SSI didn't work
-    onReady={(err) => {
+    onReady={(err, status) => {
       if (err) {
         console.error(err)
       }
@@ -38,5 +35,7 @@ const Component = () => (
 ```
 
 ## Notes
+
+Automatically falls back to resolve the content client side in case the SSI directive hasn't been resolved.
 
 In case you plan to use this on a kubernetes cluster, then double check whether the ssi nginx core module is available with your current ingress controller. In case it's not, you might want to replace it with a different one, see https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/nginx-ingress-controllers.md

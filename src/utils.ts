@@ -1,9 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
-const getSSITag = (url: string) => `<!--#include virtual="${url}" -->`
 
-const fetchFallbackHtml = (url: string): Promise<string> => {
-  console.error(`Server Side Include with url ${url} failed, falling back to client side include.`)
+export function getInitialHtml (tagId: string): string | null {
+  if (!isClientSide()) {
+    return null
+  }
+
+  const element = window.document.getElementById(tagId);
+  return element ? element.innerHTML : null
+}
+
+export function getSSITag (url: string) {
+  return `<!--#include virtual="${url}" -->`
+}
+
+export function fetchFallbackHtml (url: string): Promise<string> {
   let basicAuthHeader: any
   try {
     const { origin, username, password, pathname } = new URL(url)
@@ -15,6 +25,7 @@ const fetchFallbackHtml = (url: string): Promise<string> => {
     }
     // eslint-disable-next-line no-empty
   } catch {}
+
   return new Promise((resolve, reject) => {
     fetch(url, {
       headers: basicAuthHeader
@@ -30,7 +41,7 @@ const fetchFallbackHtml = (url: string): Promise<string> => {
   })
 }
 
-const remountScripts = (id: string) => {
+export function remountScripts (id: string) {
   const document = window.document
   if (document) {
     const element = document.getElementById(id)
@@ -54,4 +65,6 @@ const remountScripts = (id: string) => {
   }
 }
 
-export { getSSITag, fetchFallbackHtml, remountScripts }
+export function isClientSide () {
+  return typeof window !== 'undefined'
+}

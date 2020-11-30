@@ -1,9 +1,9 @@
 import React from 'react'
+
 export interface SSIInlcudeProps {
-  client?: boolean
   tagId: string
   url: string
-  onReady?: (error?: Error) => void
+  onReady?: (error: Error | null, status: { type: string, message: string }) => void
 }
 
 export declare const SSIInclude: React.FunctionComponent<SSIInlcudeProps>
