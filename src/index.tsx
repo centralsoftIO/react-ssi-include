@@ -3,7 +3,9 @@ import { getSSITag, fetchFallbackHtml, remountScripts } from './utils'
 import { SSIInlcudeProps } from './types'
 
 export const SSIInclude = (props: SSIInlcudeProps) => {
-  const [content, setContent] = useState(getSSITag(props.url))
+  const initialHtml = getInitialHtml(props.tagId, props.client)
+  const initialContent = initialHtml || getSSITag(props.url)
+  const [content, setContent] = useState(initialContent)
 
   useEffect(() => {
     if (props.client || content === getSSITag(props.url)) {
@@ -37,4 +39,12 @@ export const SSIInclude = (props: SSIInlcudeProps) => {
       suppressHydrationWarning={true}
     />
   )
+}
+
+const getInitialHtml = (tagId: string, client?: boolean): string | null => {
+  if (client && window) {
+    const element = window.document.getElementById(tagId);
+    return element ? element.innerHTML : null
+  }
+  return null
 }
