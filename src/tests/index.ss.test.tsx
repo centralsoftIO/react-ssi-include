@@ -1,14 +1,17 @@
 import React from 'react'
 import { render, waitFor, screen, cleanup } from '@testing-library/react'
 
+// tslint:disable-next-line: no-var-requires
 const fetchFallbackHtml = require('../fetch_fallback_html')
 const mockFetchFallbackHtml = jest.fn((url) => Promise.resolve(`<div>partial for ${url}</div>`)) as jest.MockedFunction<typeof fetchFallbackHtml>
 jest.mock('../fetch_fallback_html', () => mockFetchFallbackHtml)
 
+// tslint:disable-next-line: no-var-requires
 const isClientSide = require('../is_client_side')
 const mockIsClientSide = jest.fn(() => false) as jest.MockedFunction<typeof isClientSide>
 jest.mock('../is_client_side', () => mockIsClientSide)
 
+// tslint:disable-next-line: no-var-requires
 const SSIInclude = require('../index').SSIInclude
 const testId = 'react-ssi-include'
 
