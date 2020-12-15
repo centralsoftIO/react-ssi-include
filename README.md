@@ -24,7 +24,7 @@ const Component = () => (
   <SSIInclude
     tagId="partial-container"
     url="https://example.com/some-partial"
-    onReady={(err, status) => {
+    onClientSideFetch={(err, status) => {
       if (err) {
         console.error(err)
       }
