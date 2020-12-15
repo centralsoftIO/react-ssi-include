@@ -1,9 +1,10 @@
 import React from 'react'
 
-export interface SSIInlcudeProps {
+export interface SSIIncludeProps {
   tagId: string
+  testId?: string
   url: string
-  onReady?: (error: Error | null, status: { type: string, message: string }) => void
+  onClientSideFetch?: (error: Error | null, status: { type: string, message: string }) => void
 }
 
-export declare const SSIInclude: React.FunctionComponent<SSIInlcudeProps>
+export declare const SSIInclude: React.FunctionComponent<SSIIncludeProps>

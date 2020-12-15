@@ -1,48 +1,49 @@
 import React, { useState, useEffect } from 'react'
 
-import { SSIInlcudeProps } from './types'
+import { SSIIncludeProps } from './types'
 
-import { isClientSide, getInitialHtml, getSSITag, fetchFallbackHtml, remountScripts } from './utils'
+import isClientSide from './is_client_side'
+import fetchFallbackHtml from './fetch_fallback_html'
+import { getInitialHtml, getSSITag, remountScripts } from './utils'
 
-export const SSIInclude = (props: SSIInlcudeProps) => {
-  const initialHtml = getInitialHtml(props.tagId)
-  const initialContent = initialHtml || getSSITag(props.url)
+export const SSIInclude = (props: SSIIncludeProps) => {
+  const initialContent = isClientSide() ? (getInitialHtml(props.tagId) || '') : getSSITag(props.url)
   const [content, setContent] = useState(initialContent)
 
   useEffect(() => {
-    if (isClientSide() && content === getSSITag(props.url)) {
+    if (isClientSide() && (content === getSSITag(props.url) || content === '')) {
       fetchFallbackHtml(props.url)
         .then(response => {
           setContent(response)
-          if (props.onReady) {
+          if (props.onClientSideFetch) {
             const status = {
               type: 'warning',
               message: 'Resolved content client-side.'
             }
-            props.onReady(null, status)
+            props.onClientSideFetch(null, status)
           }
         })
         .catch(err => {
-          if (props.onReady) {
+          if (props.onClientSideFetch) {
             const status = {
               type: 'error',
-              message: 'Client-side fallback fetch failed.'
+              message: `Client-side fallback fetch failed.${err ? ` ${err}` : ''}`
             }
-            props.onReady(err, status)
+            props.onClientSideFetch(err, status)
           }
         })
     }
-  }, [])
 
-  useEffect(() => {
-    if (isClientSide() && content !== getSSITag(props.url)) {
+    if (isClientSide() && content !== getSSITag(props.url) && content !== '') {
       remountScripts(props.tagId)
     }
   }, [content])
 
+  if (!content) { return null }
   return (
     <div
       id={props.tagId}
+      data-testid={props.testId}
       dangerouslySetInnerHTML={{
         __html: content
       }}
