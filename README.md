@@ -18,7 +18,7 @@ The component is meant to be used alongside Server Side Rendering (SSR).
 Tested with next.js (SSR) and a fronting nginx (k8s).
 
 ```
-import { SSIInclude } from 'react-ssi-include';
+import { SSIInclude } from 'react-ssi-include'
 
 const Component = () => (
   <SSIInclude
