@@ -53,7 +53,7 @@ describe('SSIInclude Component, client side', () => {
     })
 
     await waitFor(() => {
-      screen.getAllByTestId('server-response')
+      screen.getByTestId('server-response')
     })
 
     const { getByTestId } = render(
@@ -101,7 +101,7 @@ describe('SSIInclude Component, client side', () => {
     })
 
     await waitFor(() => {
-      screen.getAllByTestId('server-response')
+      screen.getByTestId('server-response')
     })
 
     const { getByTestId } = render(<SSIInclude url={url} tagId={tagId} testId={testId} />, {
@@ -142,7 +142,7 @@ describe('SSIInclude Component, client side', () => {
     })
 
     await waitFor(() => {
-      screen.getAllByTestId('server-response')
+      screen.getByTestId('server-response')
     })
 
     render(
@@ -196,7 +196,7 @@ describe('SSIInclude Component, client side', () => {
     })
 
     await waitFor(() => {
-      screen.getAllByTestId('server-response')
+      screen.getByTestId('server-response')
     })
 
     render(
