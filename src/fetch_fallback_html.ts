@@ -1,4 +1,4 @@
-export default function fetchFallbackHtml (url: string): Promise<string> {
+export function fetchFallbackHtml (url: string): Promise<string> {
   let basicAuthHeader: any
   try {
     const { origin, username, password, pathname } = new URL(url)
@@ -8,7 +8,8 @@ export default function fetchFallbackHtml (url: string): Promise<string> {
         Authorization: 'Basic ' + btoa(username + ':' + password)
       }
     }
-    // eslint-disable-next-line no-empty
+  // eslint-disable-next-line no-empty
+  // tslint:disable-next-line: no-empty
   } catch {}
 
   return new Promise((resolve, reject) => {

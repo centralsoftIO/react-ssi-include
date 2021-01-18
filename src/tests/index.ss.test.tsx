@@ -1,15 +1,18 @@
 import React from 'react'
 import { render, waitFor, screen, cleanup } from '@testing-library/react'
 
-// tslint:disable-next-line: no-var-requires
-const fetchFallbackHtml = require('../fetch_fallback_html')
-const mockFetchFallbackHtml = jest.fn((url) => Promise.resolve(`<div>partial for ${url}</div>`)) as jest.MockedFunction<typeof fetchFallbackHtml>
-jest.mock('../fetch_fallback_html', () => mockFetchFallbackHtml)
+jest.mock('../fetch_fallback_html', () => ({
+  ...(jest.requireActual('../fetch_fallback_html')),
+  fetchFallbackHtml: jest.fn((url) => Promise.resolve(`<div>partial for ${url}</div>`))
+}))
 
-// tslint:disable-next-line: no-var-requires
-const isClientSide = require('../is_client_side')
-const mockIsClientSide = jest.fn(() => false) as jest.MockedFunction<typeof isClientSide>
-jest.mock('../is_client_side', () => mockIsClientSide)
+jest.mock('../is_client_side', () => ({
+  ...(jest.requireActual('../is_client_side')),
+  isClientSide: jest.fn(() => false)
+}))
+
+import { fetchFallbackHtml } from '../fetch_fallback_html'
+import { isClientSide } from '../is_client_side'
 
 // tslint:disable-next-line: no-var-requires
 const SSIInclude = require('../index').SSIInclude
@@ -23,7 +26,11 @@ describe('SSIInclude Component, server side', () => {
     container = document.createElement('div')
   })
 
-  afterEach(cleanup)
+  afterEach(() => {
+    cleanup()
+    ;(fetchFallbackHtml as jest.MockedFunction<typeof fetchFallbackHtml>).mockClear()
+    ;(isClientSide as jest.MockedFunction<typeof isClientSide>).mockClear()
+  })
 
   it('should render the SSI virtual tag', async () => {
     const tagId = 'some-unique-id'
@@ -40,7 +47,7 @@ describe('SSIInclude Component, server side', () => {
     expect(ssiInclude).toBeDefined()
     expect(ssiInclude.innerHTML).toEqual(`<!--#include virtual="${url}" -->`)
 
-    expect(mockFetchFallbackHtml).toBeCalledTimes(0)
+    expect(fetchFallbackHtml).toBeCalledTimes(0)
   })
 
 })

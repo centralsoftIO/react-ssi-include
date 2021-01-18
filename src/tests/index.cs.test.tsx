@@ -2,16 +2,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { render, waitFor, screen, act, cleanup } from '@testing-library/react'
 
-// tslint:disable-next-line: no-var-requires
-const fetchFallbackHtml = require('../fetch_fallback_html')
-const mockFetchFallbackHtml =
-  jest.fn((url) => Promise.resolve(`<div>partial for ${url}</div>`)) as jest.MockedFunction<typeof fetchFallbackHtml>
-jest.mock('../fetch_fallback_html', () => mockFetchFallbackHtml)
+jest.mock('../fetch_fallback_html', () => ({
+  ...(jest.requireActual('../fetch_fallback_html')),
+  fetchFallbackHtml: jest.fn((url) => Promise.resolve(`<div>partial for ${url}</div>`))
+}))
 
-// tslint:disable-next-line: no-var-requires
-const isClientSide = require('../is_client_side')
-const mockIsClientSide = jest.fn(() => true) as jest.MockedFunction<typeof isClientSide>
-jest.mock('../is_client_side', () => mockIsClientSide)
+jest.mock('../is_client_side', () => ({
+  ...(jest.requireActual('../is_client_side')),
+  isClientSide: jest.fn(() => true)
+}))
+
+import { fetchFallbackHtml } from '../fetch_fallback_html'
+import { isClientSide } from '../is_client_side'
 
 // tslint:disable-next-line: no-var-requires
 const SSIInclude = require('../index').SSIInclude
@@ -27,8 +29,8 @@ describe('SSIInclude Component, client side', () => {
 
   afterEach(() => {
     cleanup()
-    mockFetchFallbackHtml.mockClear()
-    mockIsClientSide.mockClear()
+    ;(fetchFallbackHtml as jest.MockedFunction<typeof fetchFallbackHtml>).mockClear()
+    ;(isClientSide as jest.MockedFunction<typeof isClientSide>).mockClear()
   })
 
   it('should keep the present markup, no client side fetch and no onClientSideFetch call', async () => {
@@ -76,7 +78,7 @@ describe('SSIInclude Component, client side', () => {
     expect(ssiInclude).toBeDefined()
     expect(ssiInclude.innerHTML).toEqual(serverSideHtml)
 
-    expect(mockFetchFallbackHtml).toBeCalledTimes(0)
+    expect(fetchFallbackHtml).toBeCalledTimes(0)
     expect(onClientSideFetchMock).toBeCalledTimes(0)
   })
 
@@ -116,8 +118,8 @@ describe('SSIInclude Component, client side', () => {
     expect(ssiInclude).toBeDefined()
     expect(ssiInclude.innerHTML).toEqual(`<div>partial for ${url}</div>`)
 
-    expect(mockFetchFallbackHtml).toBeCalledTimes(1)
-    expect(mockFetchFallbackHtml).toBeCalledWith(url)
+    expect(fetchFallbackHtml).toBeCalledTimes(1)
+    expect(fetchFallbackHtml).toBeCalledWith(url)
   })
 
   it('should propagate status and warning via onClientSideFetch', async () => {
@@ -173,7 +175,7 @@ describe('SSIInclude Component, client side', () => {
 
   it('should propagate status and error via onClientSideFetch', async () => {
     const expectedError = new Error('Bad request')
-    mockFetchFallbackHtml.mockImplementationOnce(() => Promise.reject(expectedError))
+    ;(fetchFallbackHtml as jest.MockedFunction<typeof fetchFallbackHtml>).mockImplementationOnce(() => Promise.reject(expectedError))
 
     const tagId = 'some-unique-id'
     const url = 'https://example.com'
