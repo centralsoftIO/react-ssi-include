@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import isClientSide from './is_client_side'
+import { isClientSide } from './is_client_side'
 
 export function getInitialHtml (id: string): string | null {
   if (!isClientSide()) {
