@@ -8,8 +8,9 @@
     "prepublishOnly": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "tslint src/**/*.tsx && tsc",
+    "build": "npm run lint && tsc",
     "clean": "rm -rf lib",
+    "lint": "tslint -p tsconfig.json",
     "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\""
   },
   "bugs": {

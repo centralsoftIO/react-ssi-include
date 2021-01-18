@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 
 import { SSIIncludeProps } from './types'
 
-import isClientSide from './is_client_side'
-import fetchFallbackHtml from './fetch_fallback_html'
+import { isClientSide } from './is_client_side'
+import { fetchFallbackHtml } from './fetch_fallback_html'
 import { getInitialHtml, getSSITag, remountScripts } from './utils'
 
 export const SSIInclude = (props: SSIIncludeProps) => {
