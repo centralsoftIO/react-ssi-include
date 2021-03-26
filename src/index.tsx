@@ -14,7 +14,13 @@ export const SSIInclude = (props: SSIIncludeProps) => {
     if (isClientSide() && (content === getSSITag(props.url) || content === '')) {
       fetchFallbackHtml(props.url)
         .then(response => {
-          setContent(response)
+          if (!response.ok) {
+            throw new Error(`Failed to load ${props.url}. Got status ${response.status}.`)
+          }
+          return response.text()
+        })
+        .then(data => {
+          setContent(data)
           if (props.onClientSideFetch) {
             const status = {
               type: 'warning',

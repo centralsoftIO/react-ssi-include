@@ -4,7 +4,11 @@ import { render, waitFor, screen, act, cleanup } from '@testing-library/react'
 
 jest.mock('../fetch_fallback_html', () => ({
   ...(jest.requireActual('../fetch_fallback_html')),
-  fetchFallbackHtml: jest.fn((url) => Promise.resolve(`<div>partial for ${url}</div>`))
+  fetchFallbackHtml: jest.fn((url) => Promise.resolve({
+    ok: true,
+    status: 200,
+    text: () => Promise.resolve(`<div>partial for ${url}</div>`)
+  }))
 }))
 
 jest.mock('../is_client_side', () => ({
