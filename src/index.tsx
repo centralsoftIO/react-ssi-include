@@ -26,7 +26,7 @@ export const SSIInclude = (props: SSIIncludeProps) => {
           const { response, data } = result
           if (!response.ok) {
             throw new Error(
-              `Failed to successfully load ${props.url}. Got status ${response.status} ${data ? `with response text "${data}"` : ''}.`
+              `Failed to successfully load ${props.url}. Got status ${response.status}${data ? ` with response text "${data}"` : ''}.`
             )
           }
 
