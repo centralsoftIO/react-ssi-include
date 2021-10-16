@@ -40,6 +40,8 @@ export const SSIInclude = (props: SSIIncludeProps) => {
           }
         })
         .catch(err => {
+          if (err.name === 'AbortError') return
+
           if (props.onClientSideFetch) {
             const status = {
               type: 'error',
