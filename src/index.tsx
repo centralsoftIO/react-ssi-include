@@ -11,8 +11,12 @@ export const SSIInclude = (props: SSIIncludeProps) => {
   const [content, setContent] = useState(initialContent)
 
   useEffect(() => {
+    let triggerRequestAbortion = () => {/* noop */}
+
     if (isClientSide() && (content === getSSITag(props.url) || content === '')) {
-      fetchFallbackHtml(props.url)
+      const request = fetchFallbackHtml(props.url)
+      triggerRequestAbortion = request.abort
+      request.ready
         .then(response => {
           return response.text()
             .then((data) => ({ response, data }))
@@ -48,6 +52,10 @@ export const SSIInclude = (props: SSIIncludeProps) => {
 
     if (isClientSide() && content !== getSSITag(props.url) && content !== '') {
       remountScripts(props.tagId)
+    }
+
+    return () => {
+      triggerRequestAbortion()
     }
   }, [content])
 
