@@ -11,12 +11,11 @@ export const SSIInclude = (props: SSIIncludeProps) => {
   const [content, setContent] = useState(initialContent)
 
   useEffect(() => {
-    let triggerRequestAbortion = () => {/* noop */}
+    let fallbackRequest: ReturnType<typeof fetchFallbackHtml> | undefined
 
     if (isClientSide() && (content === getSSITag(props.url) || content === '')) {
-      const request = fetchFallbackHtml(props.url)
-      triggerRequestAbortion = () => request.abort()
-      request.ready()
+      fallbackRequest = fetchFallbackHtml(props.url)
+      fallbackRequest.ready()
         .then(response => {
           return response.text()
             .then((data) => ({ response, data }))
@@ -57,11 +56,14 @@ export const SSIInclude = (props: SSIIncludeProps) => {
     }
 
     return () => {
-      triggerRequestAbortion()
+      if (fallbackRequest) {
+        fallbackRequest.abort()
+      }
     }
   }, [content])
 
   if (!content) { return null }
+
   return (
     <div
       id={props.tagId}
