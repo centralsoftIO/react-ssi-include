@@ -15,8 +15,12 @@ export function fetchFallbackHtml (url: string) {
   const { controller, signal } = initAbortController()
   
   return {
-    abort: () => controller && controller.abort(),
-    ready: fetch(url, { headers, ...(signal ? { signal } : {}) })
+    abort () {
+      return controller && controller.abort()
+    },
+    ready () {
+      return fetch(url, { headers, ...(signal ? { signal } : {}) })
+    }
   }
 }
 

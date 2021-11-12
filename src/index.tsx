@@ -15,8 +15,8 @@ export const SSIInclude = (props: SSIIncludeProps) => {
 
     if (isClientSide() && (content === getSSITag(props.url) || content === '')) {
       const request = fetchFallbackHtml(props.url)
-      triggerRequestAbortion = request.abort
-      request.ready
+      triggerRequestAbortion = () => request.abort()
+      request.ready()
         .then(response => {
           return response.text()
             .then((data) => ({ response, data }))
