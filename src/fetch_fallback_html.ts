@@ -11,6 +11,25 @@ export function fetchFallbackHtml (url: string) {
   // eslint-disable-next-line no-empty
   // tslint:disable-next-line: no-empty
   } catch {}
+
+  const { controller, signal } = initAbortController()
   
-  return fetch(url, { headers })
+  return {
+    abort () {
+      return controller && controller.abort()
+    },
+    ready () {
+      return fetch(url, { headers, ...(signal ? { signal } : {}) })
+    }
+  }
+}
+
+function initAbortController () {
+  try {
+    const controller = new AbortController()
+    const signal = controller.signal
+    return { controller, signal }
+  } catch (err) {
+    return {}
+  }
 }

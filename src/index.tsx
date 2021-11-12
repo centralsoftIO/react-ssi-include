@@ -11,15 +11,24 @@ export const SSIInclude = (props: SSIIncludeProps) => {
   const [content, setContent] = useState(initialContent)
 
   useEffect(() => {
+    let fallbackRequest: ReturnType<typeof fetchFallbackHtml> | undefined
+
     if (isClientSide() && (content === getSSITag(props.url) || content === '')) {
-      fetchFallbackHtml(props.url)
+      fallbackRequest = fetchFallbackHtml(props.url)
+      fallbackRequest.ready()
         .then(response => {
-          if (!response.ok) {
-            throw new Error(`Failed to load ${props.url}. Got status ${response.status}.`)
-          }
           return response.text()
+            .then((data) => ({ response, data }))
+            .catch(() => ({ response, data: '' }))
         })
-        .then(data => {
+        .then(result => {
+          const { response, data } = result
+          if (!response.ok) {
+            throw new Error(
+              `Failed to successfully load ${props.url}. Got status ${response.status}${data ? ` with response text "${data}"` : ''}.`
+            )
+          }
+
           setContent(data)
           if (props.onClientSideFetch) {
             const status = {
@@ -30,6 +39,8 @@ export const SSIInclude = (props: SSIIncludeProps) => {
           }
         })
         .catch(err => {
+          if (err.name === 'AbortError') return
+
           if (props.onClientSideFetch) {
             const status = {
               type: 'error',
@@ -43,9 +54,16 @@ export const SSIInclude = (props: SSIIncludeProps) => {
     if (isClientSide() && content !== getSSITag(props.url) && content !== '') {
       remountScripts(props.tagId)
     }
+
+    return () => {
+      if (fallbackRequest) {
+        fallbackRequest.abort()
+      }
+    }
   }, [content])
 
   if (!content) { return null }
+
   return (
     <div
       id={props.tagId}
